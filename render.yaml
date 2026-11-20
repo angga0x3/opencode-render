@@ -7,7 +7,7 @@ services:
   - type: web
     name: opencode-server
     runtime: docker
-    plan: free
+    plan: standard
     dockerfilePath: ./Dockerfile
     dockerContext: .
     # /site.webmanifest dilayani embedded web UI tanpa auth, jadi health check
@@ -39,16 +39,12 @@ services:
         sync: false
       - key: XAI_API_KEY
         sync: false
-    # ── Persistensi (OPSIONAL) ─────────────────────────────────────────────
-    # Disk hanya tersedia di plan berbayar (free plan tidak mendukung disk).
-    # Jika diaktifkan, sesi/auth/konfig opencode bertahan antar-deploy.
-    # Aktifkan blok di bawah ini, lalu tambahkan ke envVars di atas:
-    #   - key: XDG_DATA_HOME
-    #     value: /data/xdg-data
-    #   - key: XDG_CONFIG_HOME
-    #     value: /data/xdg-config
-    #
-    # disk:
-    #   name: opencode-data
-    #   mountPath: /data
-    #   sizeGB: 1
+      # ── Persistensi ── arahkan data/konfig opencode ke disk di bawah ──
+      - key: XDG_DATA_HOME
+        value: /data/xdg-data
+      - key: XDG_CONFIG_HOME
+        value: /data/xdg-config
+    disk:
+      name: opencode-data
+      mountPath: /data
+      sizeGB: 1

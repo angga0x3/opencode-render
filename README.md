@@ -51,14 +51,12 @@ URL service: `https://<nama-service>.onrender.com`
 
 ## Catatan & batasan
 
-- **Plan free** → instance tidur setelah ±15 menit tanpa traffic (request
-  pertama berikutnya lambat/cold start), dan **tidak mendukung disk** — data
-  sesi di `~/.local/share/opencode` hilang saat deploy ulang/restart.
-- **Persistensi**: upgrade ke plan berbayar, aktifkan blok `disk:` (mount
-  `/data`, 1 GB) beserta `XDG_DATA_HOME` / `XDG_CONFIG_HOME` yang sudah
-  disiapkan (terkomentar) di `render.yaml`.
+- **Instance Standard** (1 CPU / 2 GB, ±$25/bln) → selalu aktif, tidak sleep.
+  Biaya menggerus kredit workspace dulu; kartu baru ditagih setelah kredit habis.
+- **Disk 1 GB di `/data`** (±$0.25/bln): sesi, auth, dan konfigurasi opencode
+  (`XDG_DATA_HOME`/`XDG_CONFIG_HOME` → `/data/...`) bertahan antar-deploy.
 - **Ganti versi**: ubah `ARG OPENCODE_VERSION` di `Dockerfile`
   (line v1 terakhir saat blueprint ini dibuat: `1.19.6`; jangan pakai tag
   `2.x` — CLI-nya berbeda, npm `@opencode/cli`).
 - Binary kebutuhan lain (LSP, registry models.dev) diunduh on-demand saat
-  pertama dipakai; di free plan ini diulang setiap deploy.
+  pertama dipakai; karena data dir ada di disk, unduhan ini juga bertahan.
