@@ -1,0 +1,54 @@
+# Render Blueprint — OpenCode CLI v1 headless via `opencode serve`
+# Deploy: push folder ini ke GitHub (render.yaml harus di root repo)
+#         lalu di Render: New + → Blueprint → pilih repo → Apply
+# Spec: https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: opencode-server
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    # /site.webmanifest dilayani embedded web UI tanpa auth, jadi health check
+    # tetap HTTP 200 walaupun OPENCODE_SERVER_PASSWORD (Basic auth) aktif.
+    # (Jangan pakai /doc — endpoint itu 401 saat password diset.)
+    healthCheckPath: /site.webmanifest
+    autoDeploy: true
+    envVars:
+      # Password HTTP Basic untuk melindungi server. WAJIB diisi saat apply
+      # (sync: false = diisi di dashboard, tidak tersimpan di repo).
+      # Kalau dibiarkan kosong, siapa pun yang tahu URL bisa memakai
+      # API key provider Anda lewat API ini.
+      - key: OPENCODE_SERVER_PASSWORD
+        sync: false
+      # Username Basic auth (opsional; default "opencode")
+      - key: OPENCODE_SERVER_USERNAME
+        value: opencode
+      # Kredensial provider AI — isi HANYA yang dipakai, sisanya boleh dibiarkan.
+      # (nama env var mengikuti registry models.dev yang dipakai opencode)
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: GOOGLE_API_KEY
+        sync: false
+      - key: OPENROUTER_API_KEY
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: XAI_API_KEY
+        sync: false
+    # ── Persistensi (OPSIONAL) ─────────────────────────────────────────────
+    # Disk hanya tersedia di plan berbayar (free plan tidak mendukung disk).
+    # Jika diaktifkan, sesi/auth/konfig opencode bertahan antar-deploy.
+    # Aktifkan blok di bawah ini, lalu tambahkan ke envVars di atas:
+    #   - key: XDG_DATA_HOME
+    #     value: /data/xdg-data
+    #   - key: XDG_CONFIG_HOME
+    #     value: /data/xdg-config
+    #
+    # disk:
+    #   name: opencode-data
+    #   mountPath: /data
+    #   sizeGB: 1
